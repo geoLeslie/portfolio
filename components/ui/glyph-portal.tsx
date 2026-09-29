@@ -126,6 +126,8 @@ export default function GlyphPortal({
     const mountedAt = performance.now();
     let browserFrameSeen = false, stalled = false;
     let W = 1, H = 1, travel = 1, startScale = 1, endScale = 1;
+    let tallest = 0;
+    const touchScreen = window.matchMedia("(pointer: coarse)").matches;
     let center = { x: 0, y: 0 }, target: Ink | null = null;
     let lastProgress = -1;
     let candidates: Ink[] = [], letters: Letter[] = [];
@@ -256,7 +258,17 @@ export default function GlyphPortal({
       W = pin.clientWidth;
       // A 100svh probe keeps browser chrome from continually changing the scroll distance.
       const smallViewport = section.querySelector<HTMLElement>("[data-gp-viewport]")!.offsetHeight;
-      const viewportHeight = Math.max(1, Math.min(root?.clientHeight ?? smallViewport, smallViewport));
+      let viewportHeight = Math.max(1, Math.min(root?.clientHeight ?? smallViewport, smallViewport));
+      // Local change (touch screens only): Safari/Chrome on phones size 100svh
+      // to the screen WITH the bottom bar, so when the bar hides, a strip of
+      // the white landing showed below the zoom. Grow to the tallest window
+      // height seen so far, and never shrink back, so the scroll distance
+      // changes at most once (the first time the bar hides) instead of every
+      // time the bar moves. Capped so an odd reading cannot blow it up.
+      if (!root && touchScreen) {
+        tallest = Math.max(tallest, Math.min(window.innerHeight, smallViewport * 1.35));
+        viewportHeight = Math.max(viewportHeight, Math.round(tallest));
+      }
       H = motion.matches ? Math.min(viewportHeight * 0.75, 480) : viewportHeight;
       section.style.setProperty("--gp-height", `${H}px`);
       travel = H * length;
