@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+/* Dark mode is the focus for now; colours match the reference screenshots. */
+:root {
+  --background: #0a0a0a; /* neutral-950 */
+  --foreground: #ffffff;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Dotted black background, shared by the landing zoom and the projects page.
+   Both layers are viewport sized with the same dots and edge fade, so the
+   hand-off from the zoom to the page is invisible. */
+.dot-field {
+  background-color: var(--background);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: 0 0;
+}
+.dot-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Fades the dots towards the edges, like the reference image. */
+  background: radial-gradient(ellipse at center, transparent 35%, var(--background) 80%);
+}
+
+/* Projects page background: the same field, fixed to the viewport so it
+   stays put while you scroll. ::before = dots, ::after = edge fade. */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+body::before {
+  background-color: var(--background);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+body::after {
+  background: radial-gradient(ellipse at center, transparent 35%, var(--background) 80%);
+}

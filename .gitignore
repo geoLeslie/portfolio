@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.env*
+
+# local speed backup, not part of the site
+checkpoints/
+
+# private working notes, not used by the site
+content/
+taste/
+.kiro/
