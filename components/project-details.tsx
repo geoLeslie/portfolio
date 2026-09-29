@@ -12,7 +12,7 @@ export function ProjectDetails({ projects }: { projects: Project[] }) {
           <div
             className={
               p.phoneScreens?.length
-                ? "grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16"
+                ? "lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-16"
                 : ""
             }
           >
@@ -71,9 +71,13 @@ export function ProjectDetails({ projects }: { projects: Project[] }) {
           </div>
           </div>
 
-          {/* Phone mockup with app screens, to the right of the text (below it on narrow screens). */}
+          {/* Phone mockup with app screens: to the right of the text on wide
+              screens. Below 1024px it sits in its own block under the text,
+              clipped to the screen, so it can never widen the text column. */}
           {p.phoneScreens && p.phoneScreens.length > 0 && (
-            <PhoneMockupBasic images={p.phoneScreens} className="justify-self-center lg:translate-y-[50px]" />
+            <div className="mt-16 flex justify-center overflow-hidden lg:mt-0 lg:block lg:overflow-visible">
+              <PhoneMockupBasic images={p.phoneScreens} className="lg:translate-y-[50px]" />
+            </div>
           )}
           </div>
 

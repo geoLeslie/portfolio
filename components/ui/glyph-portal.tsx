@@ -248,7 +248,10 @@ export default function GlyphPortal({
     const layout = () => {
       if (!section.clientWidth) return;
       W = pin.clientWidth;
-      // A 100svh probe keeps browser chrome from continually changing the scroll distance.
+      // Local change: a 100lvh probe (was 100svh). lvh is also constant while
+      // the browser bars show and hide, but it is the TALL size, so on iPhone
+      // Safari the zoom still fills the screen when the bottom bar collapses
+      // (with svh a white strip of the landing background showed below it).
       const smallViewport = section.querySelector<HTMLElement>("[data-gp-viewport]")!.offsetHeight;
       const viewportHeight = Math.max(1, Math.min(root?.clientHeight ?? smallViewport, smallViewport));
       H = motion.matches ? Math.min(viewportHeight * 0.75, 480) : viewportHeight;
@@ -356,8 +359,8 @@ export default function GlyphPortal({
       style={{ "--gp-length": length, "--gp-characters": Array.from(text).length, ...style } as CSSProperties}>
       <style>{`
         ${q}{--gp-paper:#fff;--gp-ink:#0c1212;--gp-field:#0b3b2a;--gp-foreground:#fbfbfa;position:relative;isolation:isolate;background:var(--gp-paper);color:var(--gp-ink);font-family:Arial,sans-serif;}
-        ${q}>[data-gp-viewport]{position:absolute;inset:0 auto auto 0;height:100vh;height:100svh;width:0;pointer-events:none;visibility:hidden;}
-        ${q} [data-gp-pin]{position:relative;height:var(--gp-height,100svh);overflow:clip;isolation:isolate;container-type:size;}
+        ${q}>[data-gp-viewport]{position:absolute;inset:0 auto auto 0;height:100vh;height:100lvh;width:0;pointer-events:none;visibility:hidden;}
+        ${q} [data-gp-pin]{position:relative;height:var(--gp-height,100lvh);overflow:clip;isolation:isolate;container-type:size;}
         ${q} [data-gp-field]{position:absolute;inset:0;background:var(--gp-field);opacity:0;pointer-events:none;}
         ${q}[data-gp-ready] [data-gp-field]{opacity:1;}
         ${q} [data-gp-art]{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;}
@@ -384,7 +387,7 @@ export default function GlyphPortal({
         ${q} [data-gp-enter]:focus-visible{outline:2px solid currentColor;outline-offset:5px;}
         ${q} [data-gp-caption]:focus-within{opacity:1;pointer-events:auto;}
         ${q} [data-gp-enter]:focus-visible{background:var(--gp-paper);color:var(--gp-ink);padding:0 12px;margin:0 -12px;}
-        ${q} [data-gp-content]{box-sizing:border-box;position:relative;min-height:var(--gp-height,100svh);padding:clamp(32px,7%,100px);display:grid;align-content:center;color:var(--gp-foreground);background:var(--gp-field);overflow-wrap:anywhere;}
+        ${q} [data-gp-content]{box-sizing:border-box;position:relative;min-height:var(--gp-height,100lvh);padding:clamp(32px,7%,100px);display:grid;align-content:center;color:var(--gp-foreground);background:var(--gp-field);overflow-wrap:anywhere;}
         ${q}[data-gp-motion=on] [data-gp-pin]{position:sticky;top:0;}
         ${q}[data-gp-motion=off] [data-gp-hint]{display:none;}
         ${q}[data-gp-motion=on] [data-gp-content]{margin-top:calc((var(--gp-length) - 1) * var(--gp-height));background:transparent;opacity:var(--gp-reveal,0);pointer-events:none;}
