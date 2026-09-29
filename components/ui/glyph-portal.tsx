@@ -236,6 +236,12 @@ export default function GlyphPortal({
       section.dataset.gpChoosing = String(choosing);
       // Drop the clip only after the camera has already filled the viewport with ink.
       field.style.clipPath = t >= 1 ? "none" : `url(#${clipId})`;
+      // Local change: once the dark field fills the zoom, drop the white paper
+      // behind the section too. On phones the zoom is sized to the screen WITH
+      // the browser bar, so when the bar hides, the space below showed that
+      // white paper as a strip. Transparent shows the page's own dark dots,
+      // which are identical to the field's.
+      section.dataset.gpFilled = String(t >= 1);
       section.style.setProperty("--gp-caption", String(1 - smooth(0.01, 0.16, p)));
       section.style.setProperty("--gp-reveal", String(isStatic ? 1 : smooth(0.78, 0.9, p)));
       section.style.setProperty("--gp-field-scale", String(1 + .16 * smooth(0, .82, p)));
@@ -249,10 +255,6 @@ export default function GlyphPortal({
       if (!section.clientWidth) return;
       W = pin.clientWidth;
       // A 100svh probe keeps browser chrome from continually changing the scroll distance.
-      // Local change: the field also bleeds 40vh below the pin (--gp-bleed), so
-      // when a phone's bottom browser bar hides, the extra screen space shows
-      // the zoom (letters, then the dark field) instead of a white strip.
-      // (Sizing the whole zoom to 100lvh did not help on iOS 26 Safari.)
       const smallViewport = section.querySelector<HTMLElement>("[data-gp-viewport]")!.offsetHeight;
       const viewportHeight = Math.max(1, Math.min(root?.clientHeight ?? smallViewport, smallViewport));
       H = motion.matches ? Math.min(viewportHeight * 0.75, 480) : viewportHeight;
@@ -359,10 +361,11 @@ export default function GlyphPortal({
     <section ref={sectionRef} id={uid} className={className} aria-label={text}
       style={{ "--gp-length": length, "--gp-characters": Array.from(text).length, ...style } as CSSProperties}>
       <style>{`
-        ${q}{--gp-paper:#fff;--gp-ink:#0c1212;--gp-field:#0b3b2a;--gp-foreground:#fbfbfa;--gp-bleed:40vh;position:relative;isolation:isolate;background:var(--gp-paper);color:var(--gp-ink);font-family:Arial,sans-serif;}
+        ${q}{--gp-paper:#fff;--gp-ink:#0c1212;--gp-field:#0b3b2a;--gp-foreground:#fbfbfa;position:relative;isolation:isolate;background:var(--gp-paper);color:var(--gp-ink);font-family:Arial,sans-serif;}
         ${q}>[data-gp-viewport]{position:absolute;inset:0 auto auto 0;height:100vh;height:100svh;width:0;pointer-events:none;visibility:hidden;}
-        ${q} [data-gp-pin]{position:relative;height:var(--gp-height,100svh);overflow-x:clip;overflow-y:visible;isolation:isolate;container-type:size;}
-        ${q} [data-gp-field]{position:absolute;inset:0 0 calc(-1 * var(--gp-bleed)) 0;background:var(--gp-field);opacity:0;pointer-events:none;}
+        ${q} [data-gp-pin]{position:relative;height:var(--gp-height,100svh);overflow:clip;isolation:isolate;container-type:size;}
+        ${q} [data-gp-field]{position:absolute;inset:0;background:var(--gp-field);opacity:0;pointer-events:none;}
+        ${q}[data-gp-filled=true]{background:transparent;}
         ${q}[data-gp-ready] [data-gp-field]{opacity:1;}
         ${q} [data-gp-art]{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;}
         ${q} [data-gp-marks]{fill:none;stroke:var(--gp-ink);opacity:.6;}
