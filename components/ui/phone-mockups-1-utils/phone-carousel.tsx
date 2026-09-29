@@ -125,7 +125,7 @@ export function PhoneCarousel({
       role="region"
       aria-roledescription="carousel"
       aria-label="App screens"
-      className={`group relative h-[570px] w-[460px] max-w-full ${className}`}
+      className={`group relative h-[570px] w-[460px] max-w-full max-sm:-mb-[142px] max-sm:origin-top max-sm:scale-75 ${className}`}
     >
       {images.map((img, i) => {
         const slot = slotOf(i);

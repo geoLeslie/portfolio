@@ -141,6 +141,64 @@ export function Landing({ children }: { children: ReactNode }) {
     };
   }, [face]);
 
+  // "Back to top" (footer): instead of jumping straight to the landing page,
+  // which skipped the zoom and flashed black on phones, glide up in two parts:
+  // a quick eased scroll through the projects, then the zoom back out to the
+  // word at the same pace as the Enter glide.
+  useEffect(() => {
+    if (!face) return;
+    const content = document.querySelector<HTMLElement>("[data-landing] [data-gp-content]");
+    if (!content) return;
+
+    let raf = 0;
+    const stop = () => {
+      cancelAnimationFrame(raf);
+      raf = 0;
+      STOP_EVENTS.forEach((e) => window.removeEventListener(e, stop));
+    };
+    const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+
+    const onClick = (event: MouseEvent) => {
+      const link = (event.target as Element | null)?.closest?.<HTMLAnchorElement>('a[href="#top"]');
+      if (!link) return;
+      event.preventDefault();
+      link.blur();
+      stop();
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        window.scrollTo({ top: 0, behavior: "instant" });
+        return;
+      }
+      // Scroll position where the zoom is complete (the top of the projects).
+      const zoomEnd = Math.max(0, window.scrollY + content.getBoundingClientRect().top);
+      const startY = window.scrollY;
+      const firstLeg = Math.max(0, startY - zoomEnd);
+      const firstMs = firstLeg ? Math.min(1200, Math.max(500, firstLeg * 0.25)) : 0;
+      let startTime = 0;
+      const step = (now: number) => {
+        if (!startTime) startTime = now;
+        const elapsed = now - startTime;
+        let next: number;
+        if (elapsed < firstMs) {
+          next = startY - firstLeg * ease(elapsed / firstMs);
+        } else {
+          next = Math.min(startY, zoomEnd) - (ENTER_SCROLL_SPEED * (elapsed - firstMs)) / 1000;
+        }
+        next = Math.max(0, next);
+        window.scrollTo({ top: next, behavior: "instant" });
+        if (next <= 0) return stop();
+        raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+      STOP_EVENTS.forEach((e) => window.addEventListener(e, stop, { passive: true }));
+    };
+
+    document.addEventListener("click", onClick);
+    return () => {
+      document.removeEventListener("click", onClick);
+      stop();
+    };
+  }, [face]);
+
   if (!face) {
     return (
       <div

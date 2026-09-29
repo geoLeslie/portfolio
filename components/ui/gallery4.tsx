@@ -139,7 +139,7 @@ export function Gallery4({ title = "Gallery", items }: Gallery4Props) {
       >
         {items.map((item) => {
           const card = (
-            <div className="group relative h-full min-h-[27rem] overflow-hidden rounded-xl md:min-h-0 md:aspect-[5/4] lg:aspect-[16/9]">
+            <div className="group relative aspect-[4/3] h-full overflow-hidden rounded-xl md:aspect-[5/4] lg:aspect-[16/9]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={item.image}
@@ -148,11 +148,11 @@ export function Gallery4({ title = "Gallery", items }: Gallery4Props) {
                 className="absolute h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-[linear-gradient(rgba(10,10,10,0),rgba(10,10,10,0.45),rgba(10,10,10,0.9)_100%)]" />
-              <div className="absolute inset-x-0 bottom-0 flex flex-col items-start p-6 text-white md:p-8">
-                <div className="mb-2 text-xl font-semibold md:mb-3">
+              <div className="absolute inset-x-0 bottom-0 flex flex-col items-start p-4 text-white md:p-8">
+                <div className="mb-1 text-base font-semibold md:mb-3 md:text-xl">
                   {item.title}
                 </div>
-                <div className="line-clamp-2 text-neutral-300">
+                <div className="line-clamp-2 text-sm text-neutral-300 md:text-base">
                   {item.description}
                 </div>
                 {item.href && (
@@ -183,7 +183,7 @@ export function Gallery4({ title = "Gallery", items }: Gallery4Props) {
               data-gallery-card
               role="group"
               aria-roledescription="slide"
-              className="w-[320px] shrink-0 snap-start lg:w-[360px]"
+              className="w-[85vw] max-w-[320px] shrink-0 snap-start lg:w-[360px] lg:max-w-none"
             >
               {/* Spotlight glow frame around the card (follows the pointer).
                   Clicking a card opens its picture on its own in a new tab

@@ -14,31 +14,46 @@
  *   scrolls back into view, like the footer.
  * - Honours "reduce motion": shows the lamp fully lit with no animation.
  */
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 // Glow colours (Tailwind cyan-500 / cyan-400).
 const CYAN = "#06b6d4";
 const CYAN_LIGHT = "#22d3ee";
 
-// Light beam: fades out downwards and towards both ends of the bar.
+// Light beam: fades out downwards and towards both ends of the bar. A single
+// radial mask (no mask-composite), because iPhone Safari ignored the
+// two-layer version and showed the light as a hard-edged box.
 const beamMask = {
-  maskImage:
-    "linear-gradient(to bottom, black, transparent 85%), linear-gradient(to right, transparent, black 20%, black 80%, transparent)",
-  WebkitMaskImage:
-    "linear-gradient(to bottom, black, transparent 85%), linear-gradient(to right, transparent, black 20%, black 80%, transparent)",
-  maskComposite: "intersect",
-  WebkitMaskComposite: "source-in",
+  maskImage: "radial-gradient(ellipse 50% 100% at 50% 0%, black 35%, transparent 100%)",
+  WebkitMaskImage: "radial-gradient(ellipse 50% 100% at 50% 0%, black 35%, transparent 100%)",
 };
+
+// Full bar width in rem on desktop; phones scale everything down to fit.
+const BAR_REM = 30;
 
 export function LampHeading({ children }: { children: React.ReactNode }) {
   const reduceMotion = useReducedMotion();
   const viewport = { once: false, amount: 0.4 };
   const transition = { delay: 0.3, duration: 0.8, ease: "easeInOut" } as const;
 
-  // Collapsed -> lit width, unless reduced motion is on.
-  const grow = (from: string, to: string) =>
-    reduceMotion
+  // Scale factor so the bar (and its glow) never runs past a phone screen.
+  const [k, setK] = useState(1);
+  useEffect(() => {
+    const fit = () => {
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      setK(Math.min(1, (window.innerWidth - 48) / (BAR_REM * rem)));
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
+
+  // Collapsed -> lit width (in rem, scaled by k), unless reduced motion is on.
+  const grow = (fromRem: number, toRem: number) => {
+    const from = `${(fromRem * k).toFixed(2)}rem`;
+    const to = `${(toRem * k).toFixed(2)}rem`;
+    return reduceMotion
       ? { initial: false as const, animate: { width: to } }
       : {
           initial: { width: from, opacity: 0.5 },
@@ -46,34 +61,39 @@ export function LampHeading({ children }: { children: React.ReactNode }) {
           viewport,
           transition,
         };
+  };
 
   return (
     <div className="relative isolate flex w-full flex-col items-center">
       {/* The lamp bar */}
       <motion.div
-        {...grow("15rem", "30rem")}
+        {...grow(15, BAR_REM)}
         className="relative z-20 h-0.5"
         style={{ backgroundColor: CYAN_LIGHT }}
       />
 
-      {/* Light: starts at the bar and is clipped there (overflow-hidden),
-          so it only shines downwards out of the bar. */}
-      <div className="pointer-events-none absolute inset-x-0 top-0.5 flex h-48 justify-center overflow-hidden">
+      {/* Light: starts at the bar and is clipped there, so it only shines
+          downwards. clip-path cuts the top edge only; the old overflow-hidden
+          also cut the sides, which on a phone gave the glow hard edges. */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0.5 flex h-48 justify-center"
+        style={{ clipPath: "inset(0 -100vw -100vw -100vw)" }}
+      >
         <motion.div
-          {...grow("15rem", "30rem")}
-          className="h-full"
+          {...grow(15, BAR_REM)}
+          className="h-full shrink-0"
           style={{
             backgroundImage: `linear-gradient(to bottom, ${CYAN}66, transparent)`,
             ...beamMask,
           }}
         />
         <motion.div
-          {...grow("12rem", "24rem")}
+          {...grow(12, 24)}
           className="absolute -top-16 h-28 rounded-full opacity-40 blur-3xl"
           style={{ backgroundColor: CYAN }}
         />
         <motion.div
-          {...grow("7rem", "14rem")}
+          {...grow(7, 14)}
           className="absolute -top-12 h-20 rounded-full opacity-70 blur-2xl"
           style={{ backgroundColor: CYAN_LIGHT }}
         />

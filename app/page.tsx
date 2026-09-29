@@ -11,7 +11,7 @@ import { Footer } from "@/components/ui/footer-section";
 // id="top" is the target of the footer's "Back to top" link.
 export default function Home() {
   return (
-    <main id="top" className="w-full">
+    <main id="top" className="w-full overflow-x-clip">
       <Landing>
         <MyProjects />
         <Footer />
