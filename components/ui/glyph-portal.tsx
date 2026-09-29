@@ -248,10 +248,11 @@ export default function GlyphPortal({
     const layout = () => {
       if (!section.clientWidth) return;
       W = pin.clientWidth;
-      // Local change: a 100lvh probe (was 100svh). lvh is also constant while
-      // the browser bars show and hide, but it is the TALL size, so on iPhone
-      // Safari the zoom still fills the screen when the bottom bar collapses
-      // (with svh a white strip of the landing background showed below it).
+      // A 100svh probe keeps browser chrome from continually changing the scroll distance.
+      // Local change: the field also bleeds 40vh below the pin (--gp-bleed), so
+      // when a phone's bottom browser bar hides, the extra screen space shows
+      // the zoom (letters, then the dark field) instead of a white strip.
+      // (Sizing the whole zoom to 100lvh did not help on iOS 26 Safari.)
       const smallViewport = section.querySelector<HTMLElement>("[data-gp-viewport]")!.offsetHeight;
       const viewportHeight = Math.max(1, Math.min(root?.clientHeight ?? smallViewport, smallViewport));
       H = motion.matches ? Math.min(viewportHeight * 0.75, 480) : viewportHeight;
@@ -358,10 +359,10 @@ export default function GlyphPortal({
     <section ref={sectionRef} id={uid} className={className} aria-label={text}
       style={{ "--gp-length": length, "--gp-characters": Array.from(text).length, ...style } as CSSProperties}>
       <style>{`
-        ${q}{--gp-paper:#fff;--gp-ink:#0c1212;--gp-field:#0b3b2a;--gp-foreground:#fbfbfa;position:relative;isolation:isolate;background:var(--gp-paper);color:var(--gp-ink);font-family:Arial,sans-serif;}
-        ${q}>[data-gp-viewport]{position:absolute;inset:0 auto auto 0;height:100vh;height:100lvh;width:0;pointer-events:none;visibility:hidden;}
-        ${q} [data-gp-pin]{position:relative;height:var(--gp-height,100lvh);overflow:clip;isolation:isolate;container-type:size;}
-        ${q} [data-gp-field]{position:absolute;inset:0;background:var(--gp-field);opacity:0;pointer-events:none;}
+        ${q}{--gp-paper:#fff;--gp-ink:#0c1212;--gp-field:#0b3b2a;--gp-foreground:#fbfbfa;--gp-bleed:40vh;position:relative;isolation:isolate;background:var(--gp-paper);color:var(--gp-ink);font-family:Arial,sans-serif;}
+        ${q}>[data-gp-viewport]{position:absolute;inset:0 auto auto 0;height:100vh;height:100svh;width:0;pointer-events:none;visibility:hidden;}
+        ${q} [data-gp-pin]{position:relative;height:var(--gp-height,100svh);overflow-x:clip;overflow-y:visible;isolation:isolate;container-type:size;}
+        ${q} [data-gp-field]{position:absolute;inset:0 0 calc(-1 * var(--gp-bleed)) 0;background:var(--gp-field);opacity:0;pointer-events:none;}
         ${q}[data-gp-ready] [data-gp-field]{opacity:1;}
         ${q} [data-gp-art]{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;}
         ${q} [data-gp-marks]{fill:none;stroke:var(--gp-ink);opacity:.6;}
@@ -387,7 +388,7 @@ export default function GlyphPortal({
         ${q} [data-gp-enter]:focus-visible{outline:2px solid currentColor;outline-offset:5px;}
         ${q} [data-gp-caption]:focus-within{opacity:1;pointer-events:auto;}
         ${q} [data-gp-enter]:focus-visible{background:var(--gp-paper);color:var(--gp-ink);padding:0 12px;margin:0 -12px;}
-        ${q} [data-gp-content]{box-sizing:border-box;position:relative;min-height:var(--gp-height,100lvh);padding:clamp(32px,7%,100px);display:grid;align-content:center;color:var(--gp-foreground);background:var(--gp-field);overflow-wrap:anywhere;}
+        ${q} [data-gp-content]{box-sizing:border-box;position:relative;min-height:var(--gp-height,100svh);padding:clamp(32px,7%,100px);display:grid;align-content:center;color:var(--gp-foreground);background:var(--gp-field);overflow-wrap:anywhere;}
         ${q}[data-gp-motion=on] [data-gp-pin]{position:sticky;top:0;}
         ${q}[data-gp-motion=off] [data-gp-hint]{display:none;}
         ${q}[data-gp-motion=on] [data-gp-content]{margin-top:calc((var(--gp-length) - 1) * var(--gp-height));background:transparent;opacity:var(--gp-reveal,0);pointer-events:none;}

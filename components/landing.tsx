@@ -219,7 +219,7 @@ export function Landing({ children }: { children: ReactNode }) {
         [data-landing] [data-gp-enter]{min-height:46px;padding:0 20px;gap:24px;background:${COLORS.ink};border-radius:10px;color:#fff;font-size:14px;font-weight:600;transition:background .2s;}
         [data-landing] [data-gp-enter]:hover{background:#262626;}
         [data-landing] [data-gp-enter]:focus-visible{outline:2px solid #737373;outline-offset:4px;}
-        [data-landing] [data-gp-touch-picker]{top:auto;bottom:calc(18px + 100lvh - 100svh);}
+        [data-landing] [data-gp-touch-picker]{top:auto;bottom:18px;}
         [data-landing] [data-gp-select]{border-color:transparent;border-radius:8px;font-size:12px;color:#525252;}
         [data-landing-header]{position:absolute;inset:clamp(44px,4.5cqw,56px) clamp(24px,5cqw,64px) auto;display:flex;align-items:center;justify-content:space-between;gap:20px;}
         [data-landing-category]{font-size:12px;line-height:1.5;color:#737373;}
@@ -230,9 +230,7 @@ export function Landing({ children }: { children: ReactNode }) {
         [data-landing-cv]:hover{color:#0a0a0a;}
         [data-landing-cv]:focus-visible{outline:2px solid #737373;outline-offset:2px;}
         [data-landing-scroll]{position:absolute;inset:auto 24px 7%;text-align:center;color:#a3a3a3;font-size:11px;letter-spacing:.02em;}
-        /* The landing is sized to the tall viewport (100lvh), so keep bottom
-           items above iPhone Safari's bar: add the gap between tall and short. */
-        @media(any-pointer:coarse){[data-landing-scroll]{bottom:calc(13% + 100lvh - 100svh);}}
+        @media(any-pointer:coarse){[data-landing-scroll]{bottom:13%;}}
         @container(max-height:479px){[data-landing-scroll]{display:none;}}
         /* Part 2 is the portal's content: no padding, no box of its own, on the page's dots. */
         [data-landing] [data-gp-content]{display:block;padding:0;background:transparent!important;overflow-wrap:normal;font-family:inherit;}
