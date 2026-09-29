@@ -10,6 +10,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Nothing may stick out sideways: on phones that let the page be zoomed out
+   to a black strip. clip (not hidden) keeps position: sticky working. */
+html,
+body {
+  overflow-x: clip;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

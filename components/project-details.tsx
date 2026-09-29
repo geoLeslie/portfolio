@@ -12,7 +12,7 @@ export function ProjectDetails({ projects }: { projects: Project[] }) {
           <div
             className={
               p.phoneScreens?.length
-                ? "grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16"
+                ? "grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16"
                 : ""
             }
           >
